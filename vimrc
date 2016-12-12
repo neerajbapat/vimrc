@@ -33,15 +33,28 @@ set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
 set relativenumber              " show relative line numbers 
 
+"Setting the Leader
+let mapleader = "-"
+
+"Leader maps
+nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
+nnoremap <leader>vs :vsplit <cr>
+nnoremap <leader>hs :split <cr> 
+
 " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
 " let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
-map Q gq
+noremap Q gq
 
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
+
+" setting jk for escaping insert mode. Could be made more modular. 
+inoremap jk <Esc>
+inoremap <Esc> <nop>
 
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')
