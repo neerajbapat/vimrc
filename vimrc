@@ -32,6 +32,7 @@ set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
 set relativenumber              " show relative line numbers 
+set ignorecase		" case insensitive search
 
 "Setting the Leader
 let mapleader = "-"
