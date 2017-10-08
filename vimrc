@@ -1,112 +1,44 @@
+" Project to build vimrc from scratch. 
+" For each new feature added there would be a corresponding need for that
+" feature. 
 
-" An example for a vimrc file.
-"
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2011 Apr 15
-"
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.vimrc
-"	      for Amiga:  s:.vimrc
-"  for MS-DOS and Win32:  $VIM\_vimrc
-"	    for OpenVMS:  sys$login:.vimrc
-
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
-" Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
+" Set not compatible with vim. This is already the case by default because the
+" rc in /usr/share/vim/vim74 already sets this option but just to be sure. 
+" Vi compatible behaviour is very close to nightmarish! (Try 'vim -u NONE'.)
 set nocompatible
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
+" Backspace over everything. This is the standard backspacing behaviour that
+" we are used to. 
+set backspace=start,indent,eol
 
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file
-endif
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
-set relativenumber              " show relative line numbers 
-set ignorecase		" case insensitive search
+" Default undo behaviour is not very useful. We need to be able to undo finer
+" actions. 
+" Upon pressing 'u' in non compatible mode the last undo block is 
+" undone. An undo block is defined as the last set of changed made while in 
+" insert mode. (This definition corresponds to the current understanding and
+" can change in the future.) 
+" With the above definition of the insert mode commands such <C-U> can be 
+" tricky because they delete the entire text before the cursor while staying 
+" in the insert mode. That is enough deletion of warrant its own undo block.
+" The way to create a new undo block is via i_<C-G>u.
+inoremap <C-U> <C-G>u<C-U> 
 
-"Setting the Leader
-let mapleader = "-"
+" A new undo block every 'n' number of lines is also desirable. 'n' can be 1 
+" or whatever other value. 
+" ********* TODO ***********
 
-"Leader maps
-nnoremap <leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
-nnoremap <leader>vs :vsplit <cr>
-nnoremap <leader>hs :split <cr> 
+" Set syntax highlighting. Completely changes the reading experience. A 
+" must have! Apparently there are two choices: 
+" 	i. syntax enable
+" 	ii. syntax on 
+" The former allows the user to have custom syntax highlighting. We choose
+" this for the moment. 
+syntax enable
 
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
+" Set textwidth to 78. Makes it easy to work with vertical splits. The 
+" text should automatically wrap after the 78th column. 
+set textwidth=78
 
-" Don't use Ex mode, use Q for formatting
-noremap Q gq
-
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
-
-" setting jk for escaping insert mode. Could be made more modular. 
-inoremap jk <Esc>
-inoremap <Esc> <nop>
-
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-  set mouse=a
-endif
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
-endif
-
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
-
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
-
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=78
-
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  " Also don't do it when the mark is in the first line, that is the default
-  " position when opening a file.
-  autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-  augroup END
-
-else
-
-  set autoindent		" always set autoindenting on
-
-endif " has("autocmd")
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
-endif
+" Add 'r' to formatoptions to automatically add the comment leader to the 
+" next line after pressing <Enter> in insert mode.
+set formatoptions+=r
